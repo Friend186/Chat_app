@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, use } from 'react';
-import io from 'socket.io-client';
+import  io  from 'socket.io-client';
 import { v4 as uuidv4 } from 'uuid'; // Import UUID library for unique IDs
 const socket = io('http://localhost:5050'); // Connect to the server
 

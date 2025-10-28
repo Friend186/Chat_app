@@ -1,15 +1,36 @@
 import Footer from "../component/Footer";
 import Header  from "../component/Header";
 import Chat from "../Pages/Chat";
-import { useState } from "react";
-import {useMutation} from "@tanstack/react-query";
-
+import {  useState,useContext, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { fetchUser } from "../API/user";
+import { AuthContext } from "./App";
+interface Friend{
+    name: string;
+    _id: string;
+}
 function Mainlayout() {
+    const {user} = useContext(AuthContext);
+    const queryClient = useQueryClient();
     const [curentChat, setCurrentChat] = useState(0);
-    const namelist = ["","Alice", "Bob", "Charlie", "David" , "Eve",   "Frank", "Grace", "Heidi", "Ivan", "Judy" , "Mallory", "Niaj", "Olivia", "Peggy", "Quentin", "Rupert", "Sybil", "Trent", "Uma", "Victor", "Wendy", "Xander", "Yvonne", "Zack"];
+    const [namelist, setNamelist] = useState<Friend[]>([]);
     const handleClick = (index: number) => {
-        setCurrentChat(index);
-    }
+      setCurrentChat(index);
+    };
+    const { data } = useQuery({
+      queryKey: ['namelist'],
+      queryFn: fetchUser,
+    });
+
+    useEffect(() => {
+        const names: Friend[] = [];
+        if (data && user) {
+            for (const item of data as Friend[]) {
+                names.push({ name: item.name, _id: item._id});
+            }
+        }
+        setNamelist(names);
+    }, [data,user]);
 
     return (
         <div className="w-screen h-screen">
@@ -19,13 +40,15 @@ function Mainlayout() {
                 <div className="flex flex-col w-1/6 bg-white rounded-2xl p-5 overflow-y-auto">
                     <h1 className="text-2xl font-bold mb-2">Friends</h1>
                     <ul className="space-y-2 p-2 mt-0 ml-[1vh] overflow-y-auto hide-scrollbar">
-                        {namelist.map((name, index) => (
+                        {namelist.map((friend, index) => (
                             <li
-                                key={index}
-                                className={`text-lg cursor-pointer ${index === curentChat ? "font-bold text-blue-500" : ""}`}
+                                key={friend._id}
+                                className={`p-2 rounded-lg cursor-pointer ${
+                                    index === curentChat ? 'bg-blue-500 text-white' : 'bg-gray-100 hover:bg-gray-200'
+                                }`}
                                 onClick={() => handleClick(index)}
                             >
-                                {name}
+                                {friend.name}
                             </li>
                         ))}
                     </ul>
@@ -50,3 +73,4 @@ function Mainlayout() {
 }
 
 export default Mainlayout;
+
