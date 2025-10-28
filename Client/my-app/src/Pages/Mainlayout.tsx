@@ -3,7 +3,7 @@ import Header  from "../component/Header";
 import Chat from "../Pages/Chat";
 import {  useState,useContext, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchUser } from "../API/user";
+import { fetchUser } from "../API/Message";
 import { AuthContext } from "./App";
 interface Friend{
     name: string;
@@ -12,7 +12,7 @@ interface Friend{
 function Mainlayout() {
     const {user} = useContext(AuthContext);
     const queryClient = useQueryClient();
-    const [curentChat, setCurrentChat] = useState(0);
+    const [curentChat, setCurrentChat] = useState(-1);
     const [namelist, setNamelist] = useState<Friend[]>([]);
     const handleClick = (index: number) => {
       setCurrentChat(index);
@@ -56,15 +56,24 @@ function Mainlayout() {
 
                 {/* Right column for chat box */}
                 <div className="flex flex-col w-5/6 bg-white border border-solid rounded-2xl p-5 overflow-hidden">
-                    <h1 className="text-2xl font-bold mb-2">
-                        {`Chat with ${namelist[curentChat]}`}
-                    </h1>
-                    <div className="flex flex-row h-full w-full mx-auto overflow-y-auto p-6">
-                        <div className="flex flex-row h-full w-full">
-                            <Chat index={curentChat} />
+                    {namelist[curentChat] ? (
+                        <>
+                        <h1 className="text-2xl font-bold mb-2">
+                            Chat with {namelist[curentChat].name}
+                        </h1>
+                        <div className="flex flex-row h-full w-full mx-auto  p-6 overflow-hidden">
+                            <div className="flex flex-row h-full w-full">
+                            <Chat id={namelist[curentChat]._id.toString()} />
+                            </div>
                         </div>
-                    </div>
+                        </>
+                    ) : (
+                        <h1 className="text-2xl font-bold mb-2 text-gray-400">
+                        Select a friend to start chatting
+                        </h1>
+                    )}
                 </div>
+
             </div>
             <Footer/>
         </div>
